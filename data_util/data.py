@@ -148,8 +148,8 @@ def abstract2sents(abstract):
   sents = []
   while True:
     try:
-      start_p = abstract.index(SENTENCE_START, cur)
-      end_p = abstract.index(SENTENCE_END, start_p + 1)
+      start_p = abstract.index(str.encode(SENTENCE_START), cur)
+      end_p = abstract.index(str.encode(SENTENCE_END), start_p + 1)
       cur = end_p + len(SENTENCE_END)
       sents.append(abstract[start_p+len(SENTENCE_START):end_p])
     except ValueError as e: # no more sentences
