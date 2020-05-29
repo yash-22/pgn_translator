@@ -10,7 +10,7 @@ import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
 import data_util.config
-import data_util.config
+import data_util.data
 
 import random
 random.seed(1234)
