@@ -9,8 +9,8 @@ import numpy as np
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
-import data_util.config
-import data_util.data
+from data_util import config
+from data_util import data
 
 import random
 random.seed(1234)
