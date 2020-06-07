@@ -4,8 +4,9 @@ import os
 import time
 import sys
 
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+# import tensorflow.compat.v1 as tf
+# tf.disable_v2_behavior()
+
 import torch
 
 from data_util import config
@@ -29,7 +30,7 @@ class Evaluate(object):
         eval_dir = os.path.join(config.log_root, 'eval_%s' % (model_name))
         if not os.path.exists(eval_dir):
             os.mkdir(eval_dir)
-        self.summary_writer = tf.summary.FileWriter(eval_dir)
+        # self.summary_writer = tf.summary.FileWriter(eval_dir)
 
         self.model = model.Model(model_file_path, is_eval=True)
 
@@ -73,11 +74,11 @@ class Evaluate(object):
         while batch is not None:
             loss = self.eval_one_batch(batch)
 
-            running_avg_loss = calc_running_avg_loss(loss, running_avg_loss, self.summary_writer, iter)
+            running_avg_loss = calc_running_avg_loss(loss, running_avg_loss, iter)
             iter += 1
 
-            if iter % 100 == 0:
-                self.summary_writer.flush()
+            # if iter % 100 == 0:
+            #     self.summary_writer.flush()
             print_interval = 1000
             if iter % print_interval == 0:
                 print('steps %d, seconds for %d batch: %.2f , loss: %f' % (

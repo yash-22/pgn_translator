@@ -1,13 +1,13 @@
 import os
 
-root_dir = os.path.expanduser("./../drive/My Drive/")
+root_dir = os.path.expanduser("./")
 
 #train_data_path = os.path.join(root_dir, "ptr_nw/cnn-dailymail-master/finished_files/train.bin")
 train_data_path = os.path.join(root_dir, "finished_files/chunked/train_*")
 eval_data_path = os.path.join(root_dir, "finished_files/val.bin")
 decode_data_path = os.path.join(root_dir, "finished_files/test.bin")
 vocab_path = os.path.join(root_dir, "finished_files/vocab")
-log_root = os.path.join("./../", "/log")
+log_root = os.path.join(root_dir, "log")
 
 # Hyperparameters
 hidden_dim= 256

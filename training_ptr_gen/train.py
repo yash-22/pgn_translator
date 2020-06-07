@@ -4,8 +4,8 @@ import os
 import time
 import argparse
 
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+# import tensorflow.compat.v1 as tf
+# tf.disable_v2_behavior()
 import torch
 import training_ptr_gen.model
 from torch.nn.utils import clip_grad_norm_
@@ -16,7 +16,8 @@ from data_util import config
 from data_util.batcher import Batcher
 from data_util.data import Vocab
 from data_util.utils import calc_running_avg_loss
-import training_ptr_gen.train_util
+from training_ptr_gen.train_util import get_input_from_batch, get_output_from_batch
+from training_ptr_gen.model import Model
 
 use_cuda = config.use_gpu and torch.cuda.is_available()
 
@@ -35,7 +36,7 @@ class Train(object):
         if not os.path.exists(self.model_dir):
             os.mkdir(self.model_dir)
 
-        self.summary_writer = tf.summary.FileWriter(train_dir)
+        # self.summary_writer = tf.summary.FileWriter(train_dir)
 
     def save_model(self, running_avg_loss, iter):
         state = {
@@ -50,7 +51,7 @@ class Train(object):
         torch.save(state, model_save_path)
 
     def setup_train(self, model_file_path=None):
-        self.model = model.Model(model_file_path)
+        self.model = Model(model_file_path)
 
         params = list(self.model.encoder.parameters()) + list(self.model.decoder.parameters()) + \
                  list(self.model.reduce_state.parameters())
@@ -76,9 +77,9 @@ class Train(object):
 
     def train_one_batch(self, batch):
         enc_batch, enc_padding_mask, enc_lens, enc_batch_extend_vocab, extra_zeros, c_t_1, coverage = \
-            train_util.get_input_from_batch(batch, use_cuda)
+            get_input_from_batch(batch, use_cuda)
         dec_batch, dec_padding_mask, max_dec_len, dec_lens_var, target_batch = \
-            train_util.get_output_from_batch(batch, use_cuda)
+            get_output_from_batch(batch, use_cuda)
 
         self.optimizer.zero_grad()
 
@@ -99,7 +100,7 @@ class Train(object):
                 step_coverage_loss = torch.sum(torch.min(attn_dist, coverage), 1)
                 step_loss = step_loss + config.cov_loss_wt * step_coverage_loss
                 coverage = next_coverage
-                
+
             step_mask = dec_padding_mask[:, di]
             step_loss = step_loss * step_mask
             step_losses.append(step_loss)
@@ -125,11 +126,11 @@ class Train(object):
             batch = self.batcher.next_batch()
             loss = self.train_one_batch(batch)
 
-            running_avg_loss = calc_running_avg_loss(loss, running_avg_loss, self.summary_writer, iter)
+            running_avg_loss = calc_running_avg_loss(loss, running_avg_loss, iter)
             iter += 1
 
-            if iter % 100 == 0:
-                self.summary_writer.flush()
+            # if iter % 100 == 0:
+            #     self.summary_writer.flush()
             print_interval = 1000
             if iter % print_interval == 0:
                 print('steps %d, seconds for %d batch: %.2f , loss: %f' % (iter, print_interval,
@@ -141,11 +142,11 @@ class Train(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Train script")
     parser.add_argument("-m",
-                        dest="model_file_path", 
+                        dest="model_file_path",
                         required=False,
                         default=None,
                         help="model.Model file for retraining (default: None).")
     args = parser.parse_args()
-    
+
     train_processor = Train()
     train_processor.trainIters(config.max_iterations, args.model_file_path)

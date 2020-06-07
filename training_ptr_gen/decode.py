@@ -16,8 +16,8 @@ from data_util.batcher import Batcher
 from data_util.data import Vocab
 from data_util import data, config
 from . import model
-from data_util.utils import write_for_rouge, rouge_eval, rouge_log
-from . import train_util 
+from data_util.utils import write_for_rouge, rouge_log
+from . import train_util
 
 
 use_cuda = config.use_gpu and torch.cuda.is_available()
@@ -100,8 +100,8 @@ class BeamSearch(object):
 
         print("Decoder has finished reading dataset for single_pass.")
         print("Now starting ROUGE eval...")
-        results_dict = rouge_eval(self._rouge_ref_dir, self._rouge_dec_dir)
-        rouge_log(results_dict, self._decode_dir)
+        # results_dict = rouge_eval(self._rouge_ref_dir, self._rouge_dec_dir)
+        # rouge_log(results_dict, self._decode_dir)
 
 
     def beam_search(self, batch):
@@ -203,5 +203,3 @@ if __name__ == '__main__':
     model_filename = sys.argv[1]
     beam_Search_processor = BeamSearch(model_filename)
     beam_Search_processor.decode()
-
-
